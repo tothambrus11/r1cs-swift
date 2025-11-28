@@ -91,7 +91,7 @@ r1cs.addConstraint(constraint)
 A unique identifier for variables in the constraint system:
 
 ```swift
-let constantWire = .one            // Always represents 1 (shorthand)
+let constantWire: WireID = .one            // Always represents 1 (shorthand)
 let customWire = WireID(rawValue: 42)
 ```
 
