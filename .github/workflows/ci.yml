@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }} with Swift ${{ matrix.swift-version }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+        swift-version: [5.9, 5.10, 6.0]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: ${{ matrix.swift-version }}
+    
+    - name: Print Swift version
+      run: swift --version
+    
+    - name: Resolve dependencies
+      run: swift package resolve
+    
+    - name: Build package
+      run: swift build
+    
+    - name: Run tests
+      run: swift test --enable-code-coverage
+    
+    - name: Generate code coverage report
+      if: matrix.swift-version == '6.0' && matrix.os == 'ubuntu-22.04'
+      run: |
+        swift test --enable-code-coverage
+        xcrun llvm-cov export -format="lcov" \
+          .build/debug/R1CSPackageTests.xctest \
+          -instr-profile .build/debug/codecov/default.profdata > coverage.lcov
+    
+    - name: Upload coverage to Codecov
+      if: matrix.swift-version == '6.0' && matrix.os == 'ubuntu-22.04'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.lcov
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  build-release:
+    name: Build Release on Ubuntu
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: 6.0
+    
+    - name: Build release
+      run: swift build -c release
+    
+    - name: Test release build
+      run: swift test -c release
+
+  lint:
+    name: Swift Format Check
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: 6.0
+    
+    - name: Install SwiftFormat
+      run: |
+        wget https://github.com/nicklockwood/SwiftFormat/releases/latest/download/swiftformat_linux.zip
+        unzip swiftformat_linux.zip
+        chmod +x swiftformat
+        sudo mv swiftformat /usr/local/bin/
+    
+    - name: Check Swift formatting
+      run: swiftformat --lint Sources/ Tests/
+
+  package-validation:
+    name: Package Validation
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: 6.0
+    
+    - name: Validate package
+      run: |
+        swift package diagnose-api-breaking-changes baseline
+        swift package compute-checksum
+        swift package dump-package

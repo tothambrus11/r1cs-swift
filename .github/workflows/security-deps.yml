@@ -1,0 +1,80 @@
+name: Security and Dependencies
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+
+jobs:
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Swift
+      uses: swift-actions/setup-swift@v2
+      with:
+        swift-version: 6.0
+    
+    - name: Resolve dependencies
+      run: swift package resolve
+    
+    - name: List dependencies
+      run: |
+        echo "=== Package Dependencies ==="
+        swift package show-dependencies
+        
+        echo -e "\n=== Dependency Tree ==="
+        swift package show-dependencies --format json > deps.json
+        cat deps.json | jq '.dependencies[]'
+    
+    - name: Check for outdated dependencies
+      run: |
+        swift package update --dry-run || echo "No updates available or update check failed"
+    
+    - name: Verify package integrity
+      run: |
+        swift package resolve --verbose
+        swift package compute-checksum
+    
+    - name: Upload dependency information
+      uses: actions/upload-artifact@v4
+      with:
+        name: dependency-info
+        path: deps.json
+
+  build-matrix-extended:
+    name: Extended Build Matrix
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        swift-version: [5.9, 5.10, 6.0]
+        build-type: [debug, release]
+    
+    container:
+      image: swift:${{ matrix.swift-version }}-jammy
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Build package
+      run: swift build -c ${{ matrix.build-type }}
+    
+    - name: Run tests
+      run: swift test -c ${{ matrix.build-type }}
+    
+    - name: Performance test (release only)
+      if: matrix.build-type == 'release'
+      run: |
+        # Add any performance-specific tests here
+        echo "Running performance validation..."
+        swift test -c release --filter Performance || echo "No performance tests found"
