@@ -58,24 +58,17 @@ import BigInt
 let bn254Prime = BigUInt("21888242871839275222246405745257275088548364400416034343698204186575808495617")!
 var r1cs = R1CS(prime: bn254Prime)
 
-// Add wires (variables)
-let x = r1cs.addWire(labelId: LabelID(rawValue: 1))  // Input wire
-let y = r1cs.addWire(labelId: LabelID(rawValue: 2))  // Input wire  
-let z = r1cs.addWire(labelId: LabelID(rawValue: 3))  // Output wire
+// Add wires (variables) - labels are allocated automatically
+let x = r1cs.addWire()  // Input wire
+let y = r1cs.addWire()  // Input wire  
+let z = r1cs.addWire()  // Output wire
 
-// Create linear combinations
-var lc_x = LinearCombination()
-lc_x.addTerm(coefficient: BigUInt(1), wire: x)
-
-var lc_y = LinearCombination()  
-lc_y.addTerm(coefficient: BigUInt(1), wire: y)
-
-var lc_z = LinearCombination()
-lc_z.addTerm(coefficient: BigUInt(1), wire: z)
-
-// Add constraint: x × y = z
-let constraint = R1CSConstraint(a: lc_x, b: lc_y, c: lc_z)
-r1cs.addConstraint(constraint)
+// Create constraint: x × y = z using elegant syntax
+r1cs.addConstraint(.init(
+    a: .wire(x),           // Linear combination with just wire x
+    b: .wire(y),           // Linear combination with just wire y  
+    c: .wire(z)            // Linear combination with just wire z
+))
 
 // Print the system
 print(r1cs.debugDescription)
@@ -96,25 +89,53 @@ r1cs.addConstraint(constraint)
 A unique identifier for variables in the constraint system:
 
 ```swift
-let constantWire = R1CS.unitWire  // Always represents 1
+let constantWire = .one            // Always represents 1 (shorthand)
 let customWire = WireID(rawValue: 42)
 ```
 
-### `LinearCombination`
-Represents expressions like `3×w₁ + 5×w₂ + 7`:
+### `LabelID`
+Labels for organizing circuit variables (managed automatically by R1CS):
 
 ```swift
-var lc = LinearCombination()
-lc.addTerm(coefficient: BigUInt(3), wire: wire1)
-lc.addTerm(coefficient: BigUInt(5), wire: wire2)
-lc.addConstant(BigUInt(7))
+// ✅ Let R1CS manage labels automatically
+let x = r1cs.addWire()  // Gets next available label
+
+// ✅ Only specify labelId when you need specific label allocation
+// (advanced usage - labels come from R1CS methods, not raw construction)
+let specificLabel = r1cs.nextLabel()
+let y = r1cs.addWire(labelId: specificLabel)
 ```
 
-### `R1CSConstraint`
-A single constraint of the form A × B = C:
+### `LinearCombination`
+Represents expressions like `3×w₁ + 5×w₂ + 7`. Use concise initializers:
 
 ```swift
-let constraint = R1CSConstraint(a: leftSide, b: rightSide, c: result)
+// ✅ Preferred: Create complete expressions at once
+let lc = LinearCombination([
+    (BigUInt(3), wire1),
+    (BigUInt(5), wire2)
+], constant: BigUInt(7))
+
+// ✅ Common patterns using static methods
+let singleWire = LinearCombination.wire(x)           // Just x
+let constant = LinearCombination.constant(BigUInt(5)) // Just 5
+let wireWithCoeff = LinearCombination.term(BigUInt(3), x) // 3×x
+
+// 💡 For simple cases, use shorthands:
+let simpleWire: LinearCombination = .wire(x)
+let five: LinearCombination = .constant(5)
+```
+
+### `R1CSConstraint`  
+A single constraint of the form A × B = C. Use shorthand initializers:
+
+```swift
+// ✅ Elegant constraint creation
+let constraint: R1CSConstraint = .init(
+    a: .wire(x),                    // x
+    b: .term(BigUInt(2), y),       // 2×y  
+    c: .constant(10)               // 10
+)
 ```
 
 ## Witness Validation
@@ -155,6 +176,50 @@ let binaryData = try serializer.serialize()
 try binaryData.write(to: URL(fileURLWithPath: "circuit.r1cs"))
 ```
 
+## Best Practices
+
+### Preferred Syntax Patterns
+
+```swift
+// ✅ Use shorthand initializers and static methods
+let x = r1cs.addWire()  // Automatic label allocation
+let constraint: R1CSConstraint = .init(
+    a: .wire(x),                              // Simple wire
+    b: .term(BigUInt(3), y),                 // Coefficient × wire
+    c: .constant(42)                         // Just a constant
+)
+
+// ✅ Complex linear combinations in one go
+let multiTerm = LinearCombination([
+    (BigUInt(2), wire1),
+    (BigUInt(5), wire2), 
+    (BigUInt(1), wire3)
+], constant: BigUInt(10))                    // 2×w1 + 5×w2 + w3 + 10
+
+// ✅ Use type inference for cleaner code
+r1cs.addConstraint(.init(a: .wire(x), b: .wire(y), c: .wire(z)))
+
+// ✅ Leverage constants like .one for the unit wire
+let unitWire: WireID = .one
+```
+
+### What to Avoid
+
+```swift
+// ❌ Avoid verbose term-by-term construction
+var lc = LinearCombination()
+lc.addTerm(coefficient: BigUInt(2), wire: wire1)
+lc.addTerm(coefficient: BigUInt(5), wire: wire2)
+lc.addConstant(BigUInt(10))
+
+// ❌ Unnecessary explicit types when inferred
+let constraint = R1CSConstraint(
+    a: LinearCombination.wire(x),
+    b: LinearCombination.wire(y),
+    c: LinearCombination.wire(z)
+)
+```
+
 ## Advanced Usage
 
 ### Working with Different Fields
@@ -173,18 +238,18 @@ var productionR1CS = R1CS(prime: bn254)
 
 ```swift
 // Constraint: (2×x + 3×y) × (x - 1) = z
-var a = LinearCombination()
-a.addTerm(coefficient: BigUInt(2), wire: x)
-a.addTerm(coefficient: BigUInt(3), wire: y)
+let complexConstraint: R1CSConstraint = .init(
+    a: LinearCombination([                    // 2×x + 3×y
+        (BigUInt(2), x),
+        (BigUInt(3), y)
+    ]),
+    b: LinearCombination([                    // x - 1  
+        (BigUInt(1), x)
+    ], constant: fieldPrime - BigUInt(1)),    // -1 in field arithmetic
+    c: .wire(z)                              // z
+)
 
-var b = LinearCombination()
-b.addTerm(coefficient: BigUInt(1), wire: x)
-b.addConstant(fieldPrime - BigUInt(1))  // -1 in field arithmetic
-
-var c = LinearCombination()
-c.addTerm(coefficient: BigUInt(1), wire: z)
-
-let complexConstraint = R1CSConstraint(a: a, b: b, c: c)
+r1cs.addConstraint(complexConstraint)
 ```
 
 ### Loading from JSON Witness
@@ -233,17 +298,15 @@ This library generates R1CS in the standard format compatible with:
 ```swift
 var r1cs = R1CS(prime: bn254Prime)
 
-let x = r1cs.addWire(labelId: LabelID(rawValue: 1))
-let y = r1cs.addWire(labelId: LabelID(rawValue: 2))
+let x = r1cs.addWire()  // Label allocated automatically
+let y = r1cs.addWire()  // Label allocated automatically
 
-// x × x = y
-var lc_x = LinearCombination()
-lc_x.addTerm(coefficient: BigUInt(1), wire: x)
-
-var lc_y = LinearCombination()  
-lc_y.addTerm(coefficient: BigUInt(1), wire: y)
-
-r1cs.addConstraint(R1CSConstraint(a: lc_x, b: lc_x, c: lc_y))
+// x × x = y using elegant shorthand
+r1cs.addConstraint(.init(
+    a: .wire(x),    // x
+    b: .wire(x),    // x  
+    c: .wire(y)     // y
+))
 ```
 
 ### Range Check (ensure 0 ≤ x ≤ 255)
