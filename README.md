@@ -3,7 +3,9 @@
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A Swift library for working with R1CS (Rank-1 Constraint Systems) - a fundamental building block for zero-knowledge proofs and constraint-based cryptographic protocols.
+A Swift library for working with and serializing R1CS (Rank-1 Constraint Systems) - a fundamental building block for zero-knowledge proofs and constraint-based cryptographic protocols.
+
+The library implements the format based on [Iden3's Specification](https://github.com/iden3/r1csfile/blob/master/doc/r1cs_bin_format.md).
 
 ## What is R1CS?
 
