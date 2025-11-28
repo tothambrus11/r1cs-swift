@@ -1,0 +1,26 @@
+{
+  "": {
+    "swift-dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/master.swiftdeps"
+  },
+  "/tmp/r1cs-swift/Sources/R1CS/R1CS.swift": {
+    "dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/R1CS.d",
+    "object": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/R1CS.swift.o",
+    "swiftmodule": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/R1CS~partial.swiftmodule",
+    "swift-dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/R1CS.swiftdeps",
+    "diagnostics": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/R1CS.dia"
+  },
+  "/tmp/r1cs-swift/Sources/R1CS/Serialization.swift": {
+    "dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/Serialization.d",
+    "object": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/Serialization.swift.o",
+    "swiftmodule": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/Serialization~partial.swiftmodule",
+    "swift-dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/Serialization.swiftdeps",
+    "diagnostics": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/Serialization.dia"
+  },
+  "/tmp/r1cs-swift/Sources/R1CS/WitnessValidator.swift": {
+    "dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/WitnessValidator.d",
+    "object": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/WitnessValidator.swift.o",
+    "swiftmodule": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/WitnessValidator~partial.swiftmodule",
+    "swift-dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/WitnessValidator.swiftdeps",
+    "diagnostics": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CS.build/WitnessValidator.dia"
+  }
+}

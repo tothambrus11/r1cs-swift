@@ -1,0 +1,3 @@
+module R1CSSwiftPackageTests {
+    header "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageTests.build/include/R1CSSwiftPackageTests-Swift.h"
+}

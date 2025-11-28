@@ -1,0 +1,19 @@
+{
+  "": {
+    "swift-dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/master.swiftdeps"
+  },
+  "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.derived/R1CSTests.swift": {
+    "dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/R1CSTests.d",
+    "object": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/R1CSTests.swift.o",
+    "swiftmodule": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/R1CSTests~partial.swiftmodule",
+    "swift-dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/R1CSTests.swiftdeps",
+    "diagnostics": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/R1CSTests.dia"
+  },
+  "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.derived/all-discovered-tests.swift": {
+    "dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/all-discovered-tests.d",
+    "object": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/all-discovered-tests.swift.o",
+    "swiftmodule": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/all-discovered-tests~partial.swiftmodule",
+    "swift-dependencies": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/all-discovered-tests.swiftdeps",
+    "diagnostics": "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/R1CSSwiftPackageDiscoveredTests.build/all-discovered-tests.dia"
+  }
+}

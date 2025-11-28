@@ -1,0 +1,3 @@
+module BigInt {
+    header "/tmp/r1cs-swift/.build/x86_64-unknown-linux-gnu/debug/BigInt.build/include/BigInt-Swift.h"
+}
